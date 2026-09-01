@@ -6,7 +6,6 @@ import type { Account, AccountType, SnapshotData } from "../types";
 import { cx, downloadText, fmtINR, openWithPassphrase, sealWithPassphrase, todayISO, usePrefs, type EncPayload } from "../lib/core";
 import { accountBalance } from "../lib/compute";
 import { Badge, Btn, Card, Confirm, EmptyState, Field, SectionTitle, Sheet, TInput, TSelect, ThemePicker, Toggle, useToast } from "../components/ui";
-import CloudSync from "../components/CloudSync";
 import StorageAudit from "../components/StorageAudit";
 
 const ACC_ICON: Record<string, typeof Landmark> = { bank: Landmark, cash: Banknote, wallet: Wallet, credit: CreditCard };
@@ -65,9 +64,6 @@ export default function Settings() {
         </div>
         <ThemePicker value={prefs.theme} onChange={(t) => void updatePrefs({ theme: t })} />
       </Card>
-
-      {/* ---------- google drive cloud sync (zero-knowledge) ---------- */}
-      <CloudSync />
 
       {/* ---------- security & storage encryption ---------- */}
       <SecuritySection />
@@ -358,7 +354,6 @@ function SecuritySection() {
           {[
             { k: "Ledger at rest", v: enabled ? "sealed (ciphertext) whenever locked" : "plaintext working DB — enable Vault Lock to seal it", ok: enabled },
             { k: "Encrypted backups", v: "AES-256-GCM + PBKDF2-600k, sealed on-device", ok: true },
-            { k: "Google Drive sync", v: "optional — uploads only the sealed AES-256-GCM vault blob to Drive's hidden appDataFolder. Google sees ciphertext + a filename, nothing else", ok: true },
             { k: "Network activity", v: "zero — no sync, no telemetry, no analytics. The app never dials out", ok: true },
             { k: "Plain-JSON export", v: "readable by design (the one labelled plaintext path)", ok: false },
           ].map((r) => (

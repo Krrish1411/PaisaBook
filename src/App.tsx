@@ -7,6 +7,7 @@ import { db, seedCategories } from "./db";
 import { cx, fmtCompactINR, usePrefs, usePrivacy } from "./lib/core";
 import { Btn, Sheet, ThemePicker, ToastProvider, useToast } from "./components/ui";
 import EntrySheet from "./components/EntrySheet";
+import { initAutoLock } from "./lib/autoLock";
 
 const Dashboard = lazy(() => import("./screens/Dashboard"));
 const Entries = lazy(() => import("./screens/Entries"));
@@ -149,7 +150,6 @@ function Shell() {
       const v = await import("./lib/vault").catch(() => null);
       const enabled = (await v?.vaultEnabled()) ?? false;
       if (!enabled) {
-        // Vault Lock is mandatory — seal the ledger before first use
         setNeedsSetup(true);
         setBooted(true);
         return;
@@ -158,8 +158,7 @@ function Shell() {
       setLocked(isLocked);
       if (!isLocked) {
         await seedCategories().catch(() => undefined);
-        // zero-knowledge Drive sync watcher: only acts when enabled + unlocked + online
-        void import("./lib/gdrive").then((m) => m.startCloudWatcher()).catch(() => undefined);
+        initAutoLock();
       }
       setBooted(true);
     })();
@@ -220,7 +219,7 @@ function Shell() {
           </div>
         </header>
 
-        <main className="max-w-xl lg:max-w-[960px] xl:max-w-[1100px] mx-auto safe-bottom pt-4 lg:pt-6 lg:px-6">
+        <main className="max-w-content safe-bottom pt-4 lg:pt-6 lg:px-6">
           <BootGate>
             <Boundary label={TITLES[tab]} onRetry={() => setTab(tab)}>
               <div key={tab} className="page-enter">
