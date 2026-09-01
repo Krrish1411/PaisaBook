@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <title>PaisaBook — Personal &amp; Household Finance</title>
+    <meta name="description" content="Offline-first personal & household finance with a Brave-style sync chain: one phrase links every device, end-to-end encrypted." />
+    <meta name="theme-color" content="#0b3d2e" />
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%230b3d2e'/%3E%3Cg fill='none' stroke='%23e8940a' stroke-width='9' stroke-linecap='round'%3E%3Cpath d='M30 24h40M30 38h40M39 24c14 0 21 5.5 21 14s-7 14-21 14h-5l27 26'/%3E%3C/g%3E%3C/svg%3E" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700;12..96,800&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      html, body { margin: 0; background: #0b3d2e; }
+      #boot-fallback {
+        min-height: 100vh; min-height: 100dvh; display: grid; place-items: center;
+        background: radial-gradient(rgba(255,255,255,0.055) 1px, transparent 1.5px),
+          linear-gradient(160deg, #0e5138 0%, #0b3d2e 46%, #07271e 100%);
+        background-size: 18px 18px, auto;
+        font-family: "Bricolage Grotesque", "IBM Plex Sans", system-ui, sans-serif;
+      }
+      #boot-fallback .bf-inner { display: flex; flex-direction: column; align-items: center; gap: 12px; }
+      #boot-fallback .bf-mark {
+        width: 64px; height: 64px; border-radius: 18px; background: #e8940a; color: #fff;
+        display: grid; place-items: center; font-weight: 800; font-size: 34px;
+        box-shadow: 0 18px 40px rgba(0,0,0,0.35); animation: bf-pulse 1.4s ease-in-out infinite;
+      }
+      #boot-fallback .bf-name { color: #d9eee2; font-weight: 800; font-size: 19px; letter-spacing: -0.02em; }
+      #boot-fallback .bf-sub { color: rgba(217,238,226,0.6); font-size: 12px; }
+      @keyframes bf-pulse { 0%,100% { transform: scale(1); } 50% { transform: scale(0.92); opacity: 0.85; } }
+    </style>
+    <script>
+      try {
+        var t = localStorage.getItem("pb-theme");
+        if (t) document.documentElement.dataset.theme = t.replace(/"/g, "");
+      } catch (e) {}
+    </script>
+    <script type="module" crossorigin src="/assets/index-DyKsMfhv.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index-BQBwoy0c.css">
+  </head>
+  <body>
+    <div id="root">
+      <div id="boot-fallback">
+        <div class="bf-inner">
+          <div class="bf-mark">₹</div>
+          <div class="bf-name">PaisaBook</div>
+          <div class="bf-sub">Opening your ledger…</div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
