@@ -1,12 +1,13 @@
 import { useRef, useState } from "react";
 import { useLiveQuery } from "dexie-react-hooks";
-import { Banknote, CreditCard, Database, Download, KeyRound, Landmark, Lock, Pencil, Plus, ShieldCheck, Trash2, UnlockKeyhole, Upload, Wallet } from "lucide-react";
+import { Banknote, Clock, CreditCard, Database, Download, KeyRound, Landmark, Lock, Pencil, Plus, ShieldCheck, Trash2, UnlockKeyhole, Upload, Wallet } from "lucide-react";
 import { addAccount, db, deleteAccount, loadDemo, restoreAll, snapshotAll, updateAccount, wipeAll } from "../db";
 import type { Account, AccountType, SnapshotData } from "../types";
 import { cx, downloadText, fmtINR, openWithPassphrase, sealWithPassphrase, todayISO, usePrefs, type EncPayload } from "../lib/core";
 import { accountBalance } from "../lib/compute";
 import { Badge, Btn, Card, Confirm, EmptyState, Field, SectionTitle, Sheet, TInput, TSelect, ThemePicker, Toggle, useToast } from "../components/ui";
 import StorageAudit from "../components/StorageAudit";
+import { getAutoLockSettings, setAutoLockEnabled, setAutoLockTimeout, setLockOnTabSwitch, getTimeoutLabel } from "../lib/autoLock";
 
 const ACC_ICON: Record<string, typeof Landmark> = { bank: Landmark, cash: Banknote, wallet: Wallet, credit: CreditCard };
 
@@ -64,6 +65,9 @@ export default function Settings() {
         </div>
         <ThemePicker value={prefs.theme} onChange={(t) => void updatePrefs({ theme: t })} />
       </Card>
+
+      {/* ---------- auto-lock settings ---------- */}
+      <AutoLockSettings />
 
       {/* ---------- security & storage encryption ---------- */}
       <SecuritySection />
@@ -425,6 +429,88 @@ function RekeySheet({ onClose }: { onClose: () => void }) {
         <TInput type="password" value={p2} onChange={(e) => setP2(e.target.value)} placeholder="Again" />
       </Field>
     </Sheet>
+  );
+}
+
+/* ---------------- auto-lock settings ---------------- */
+
+function AutoLockSettings() {
+  const toast = useToast();
+  const [settings, setSettings] = useState(() => getAutoLockSettings());
+
+  const toggleEnabled = (v: boolean) => {
+    setAutoLockEnabled(v);
+    setSettings(getAutoLockSettings());
+    toast.push(v ? "Auto-lock enabled" : "Auto-lock disabled");
+  };
+
+  const toggleTabSwitch = (v: boolean) => {
+    setLockOnTabSwitch(v);
+    setSettings(getAutoLockSettings());
+    toast.push(v ? "Lock on tab-switch enabled" : "Lock on tab-switch disabled");
+  };
+
+  const setTimeoutVal = (ms: number) => {
+    setAutoLockTimeout(ms);
+    setSettings(getAutoLockSettings());
+    toast.push(`Auto-lock timeout set to ${getTimeoutLabel()}`);
+  };
+
+  return (
+    <Card className="p-4">
+      <div className="flex items-start gap-3">
+        <span className="w-10 h-10 rounded-xl grid place-items-center shrink-0 border bg-pine-50 text-pine-600 border-pine-200">
+          <Clock size={18} />
+        </span>
+        <div className="flex-1 min-w-0">
+          <div className="font-display font-bold text-[15px] text-ink">
+            Auto-Lock
+            <Badge tone="pine" icon={<ShieldCheck size={10} />} className="ml-2">privacy</Badge>
+          </div>
+          <p className="text-[12.5px] text-ink/60 mt-1 leading-relaxed">
+            Automatically lock the vault after inactivity or when switching tabs. Keeps your data secure when you step away.
+          </p>
+          <div className="mt-3 space-y-2">
+            <div className="flex items-center justify-between">
+              <span className="text-[13px] text-ink/70">Enable auto-lock</span>
+              <Toggle on={settings.enabled} onChange={toggleEnabled} label="auto-lock" />
+            </div>
+            {settings.enabled && (
+              <>
+                <div className="flex items-center justify-between">
+                  <span className="text-[13px] text-ink/70">Lock when switching tabs</span>
+                  <Toggle on={settings.lockOnTabSwitch} onChange={toggleTabSwitch} label="tab-switch" />
+                </div>
+                <div>
+                  <div className="text-[13px] text-ink/70 mb-2">Inactivity timeout: <b className="text-ink">{getTimeoutLabel()}</b></div>
+                  <div className="grid grid-cols-4 gap-2">
+                    {[
+                      { ms: 60000, label: '1 min' },
+                      { ms: 2 * 60 * 1000, label: '2 min' },
+                      { ms: 5 * 60 * 1000, label: '5 min' },
+                      { ms: 15 * 60 * 1000, label: '15 min' },
+                    ].map((opt) => (
+                      <button
+                        key={opt.ms}
+                        onClick={() => setTimeoutVal(opt.ms)}
+                        className={cx(
+                          "rounded-lg px-2 py-2 text-[12px] font-semibold border transition-all",
+                          settings.timeoutMs === opt.ms
+                            ? "bg-pine-600 text-white border-pine-600"
+                            : "bg-moss text-ink/70 border-line hover:border-pine-400"
+                        )}
+                      >
+                        {opt.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+      </div>
+    </Card>
   );
 }
 
