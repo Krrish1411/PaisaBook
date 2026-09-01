@@ -243,7 +243,10 @@ export default function Reports({ go }: { go: (t: string) => void }) {
     return buckets.map((b) => {
       const e = toISO(b.end);
       let nw = 0;
-      for (const a of active) nw += accountBalance(a, data.entries.filter((t) => t.date <= e));
+      for (const a of active) {
+        const bal = accountBalance(a, data.entries.filter((t) => t.date <= e));
+        nw += bal * (data.rates[a.currency ?? "INR"] ?? 1);
+      }
       return { label: b.label, netWorth: Math.round(nw) };
     });
   }, [data, buckets]);
