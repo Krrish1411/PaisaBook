@@ -208,9 +208,11 @@ body { background: var(--color-moss); color: var(--color-ink); }
 .no-scrollbar { scrollbar-width: none; }
 .ledger-row + .ledger-row { border-top: 1px dashed var(--color-line); }
 .safe-bottom { padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 96px); }
-.max-w-content { max-width: min(1400px, 95vw); margin-left: auto; margin-right: auto; }
-@media (min-width: 1024px) { .max-w-content { max-width: min(1600px, 90vw); } }
-@media (min-width: 1440px) { .max-w-content { max-width: min(1800px, 85vw); } }
+/* Full-width layout - utilize all available screen space */
+.max-w-content { max-width: min(1920px, 98vw); margin-left: auto; margin-right: auto; padding-left: 1rem; padding-right: 1rem; }
+@media (min-width: 768px) { .max-w-content { max-width: min(1920px, 96vw); padding-left: 1.5rem; padding-right: 1.5rem; } }
+@media (min-width: 1024px) { .max-w-content { max-width: min(1920px, 94vw); padding-left: 2rem; padding-right: 2rem; } }
+@media (min-width: 1440px) { .max-w-content { max-width: 1800px; } }
 /* kbd chips adapt to whatever text colour they sit in — readable on the dark
    active nav pill AND on the light sidebar/footer alike */
 .kbd {

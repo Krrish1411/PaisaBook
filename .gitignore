@@ -2,11 +2,14 @@
 # Dependencies
 node_modules/
 
-# Build artifacts
+# Build outputs
 dist/
 build/
-*.js.map
-*.tsbuildinfo
+target/
+
+# Logs and temp files
+*.log
+*.tmp
 
 # Environment
 .env
@@ -16,29 +19,25 @@ build/
 # Editors
 .vscode/
 .idea/
-*.swp
-*.swo
-
-# Logs
-*.log
-
-# Coverage
-coverage/
-htmlcov/
-*.coverage
-
-# OS generated files
-.DS_Store
-Thumbs.db
 
 # Python
 __pycache__/
 *.pyc
 *.pyo
 *.pyd
-.Python
-*.so
+
+# Compiled JavaScript
+*.js.map
+*.jsx.map
+*.ts.map
+*.tsx.map
+
+# Coverage
+coverage/
+htmlcov/
 .coverage
-.pytest_cache/
-.mypy_cache/
+
+# OS
+.DS_Store
+Thumbs.db
 ```

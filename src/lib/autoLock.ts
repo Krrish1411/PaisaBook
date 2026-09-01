@@ -1,14 +1,17 @@
 /**
  * Auto-lock manager - locks the vault after configurable inactivity
  * or when the tab becomes hidden.
+ * 
+ * Configurable timeouts: 2 minutes, 5 minutes, or immediate on tab switch.
  */
 
 let idleTimer: ReturnType<typeof setTimeout> | null = null;
-let idleTimeoutMs = 5 * 60 * 1000; // default 5 minutes
+let idleTimeoutMs = 2 * 60 * 1000; // default 2 minutes
+let lockOnTabSwitch = true;
 let isEnabled = true;
 let lastActivity = Date.now();
 
-const ACTIVITY_EVENTS = ['mousedown', 'keydown', 'touchstart', 'scroll', 'wheel'];
+const ACTIVITY_EVENTS = ['mousedown', 'keydown', 'touchstart', 'scroll', 'wheel', 'mousemove'];
 
 function resetTimer(): void {
   if (!isEnabled) return;
@@ -21,12 +24,15 @@ function resetTimer(): void {
 
 async function tryAutoLock(): Promise<void> {
   try {
-    const { vaultLocked, instantLock } = await import('./vault');
+    const { vaultLocked, instantLock, vaultEnabled } = await import('./vault');
+    const enabled = await vaultEnabled();
+    if (!enabled) return; // vault not enabled, nothing to lock
     const locked = await vaultLocked();
     if (!locked) {
       await instantLock();
-      // Notify user somehow - could use a toast
       console.log('[autoLock] Vault auto-locked due to inactivity');
+      // Dispatch custom event for UI notification
+      window.dispatchEvent(new CustomEvent('vault-auto-locked'));
     }
   } catch (e) {
     console.error('[autoLock] Failed to auto-lock:', e);
@@ -34,7 +40,7 @@ async function tryAutoLock(): Promise<void> {
 }
 
 async function handleVisibilityChange(): Promise<void> {
-  if (!isEnabled) return;
+  if (!isEnabled || !lockOnTabSwitch) return;
   if (typeof document === 'undefined') return;
   if (document.visibilityState === 'hidden') {
     await tryAutoLock();
@@ -44,14 +50,16 @@ async function handleVisibilityChange(): Promise<void> {
 export function initAutoLock(): void {
   if (typeof window === 'undefined') return;
   
-  // Load saved timeout from localStorage
+  // Load saved settings from localStorage
   try {
     const saved = localStorage.getItem('pb-autolock-ms');
     if (saved) {
-      idleTimeoutMs = parseInt(saved, 10) || 5 * 60 * 1000;
+      idleTimeoutMs = parseInt(saved, 10) || 2 * 60 * 1000;
     }
     const enabledStr = localStorage.getItem('pb-autolock-enabled');
     isEnabled = enabledStr !== 'false';
+    const tabSwitchStr = localStorage.getItem('pb-autolock-tabswitch');
+    lockOnTabSwitch = tabSwitchStr !== 'false';
   } catch { /* ignore */ }
 
   if (!isEnabled) return;
@@ -89,6 +97,22 @@ export function setAutoLockEnabled(enabled: boolean): void {
   }
 }
 
-export function getAutoLockSettings(): { timeoutMs: number; enabled: boolean } {
-  return { timeoutMs: idleTimeoutMs, enabled: isEnabled };
+export function setLockOnTabSwitch(enabled: boolean): void {
+  lockOnTabSwitch = enabled;
+  try {
+    localStorage.setItem('pb-autolock-tabswitch', enabled ? 'true' : 'false');
+  } catch { /* ignore */ }
+}
+
+export function getAutoLockSettings(): { timeoutMs: number; enabled: boolean; lockOnTabSwitch: boolean } {
+  return { timeoutMs: idleTimeoutMs, enabled: isEnabled, lockOnTabSwitch };
+}
+
+/** Get human-readable timeout label */
+export function getTimeoutLabel(): string {
+  if (idleTimeoutMs <= 60000) return '1 min';
+  if (idleTimeoutMs <= 2 * 60 * 1000) return '2 min';
+  if (idleTimeoutMs <= 5 * 60 * 1000) return '5 min';
+  if (idleTimeoutMs <= 15 * 60 * 1000) return '15 min';
+  return '30+ min';
 }
