@@ -1,15 +1,12 @@
 ```
-# Dependencies
-node_modules/
-
-# Build outputs
+# Build artifacts
 dist/
 build/
-target/
+*.js
+*.css
 
-# Logs and temp files
-*.log
-*.tmp
+# Dependencies
+node_modules/
 
 # Environment
 .env
@@ -18,26 +15,7 @@ target/
 
 # Editors
 .vscode/
-.idea/
 
-# Python
-__pycache__/
-*.pyc
-*.pyo
-*.pyd
-
-# Compiled JavaScript
-*.js.map
-*.jsx.map
-*.ts.map
-*.tsx.map
-
-# Coverage
-coverage/
-htmlcov/
-.coverage
-
-# OS
-.DS_Store
-Thumbs.db
+# Logs
+*.log
 ```
