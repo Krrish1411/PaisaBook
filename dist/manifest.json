@@ -1,0 +1,21 @@
+{
+  "name": "PaisaBook",
+  "short_name": "PaisaBook",
+  "description": "Offline-first personal finance with zero-knowledge encryption",
+  "start_url": "/PaisaBook/",
+  "scope": "/PaisaBook/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#0b3d2e",
+  "theme_color": "#0b3d2e",
+  "icons": [
+    {
+      "src": "/PaisaBook/icons/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["finance", "productivity"],
+  "lang": "en"
+}
