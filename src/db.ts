@@ -1,6 +1,6 @@
 import Dexie, { type Table } from "dexie";
 import type {
-  Account, Budget, Category, Entry, Goal, KeywordRule, PlannedExpense, ReservedFund, SnapshotData,
+  Account, Budget, Category, Entry, Goal, KeywordRule, PlannedExpense, ReservedFund, SnapshotData, TransactionTemplate,
 } from "./types";
 import { addDaysISO, DEFAULT_RATES, monthKey, toISO, todayISO, uid } from "./lib/core";
 
@@ -15,6 +15,7 @@ class PaisaBook extends Dexie {
   plannedExpenses!: Table<PlannedExpense, string>;
   goals!: Table<Goal, string>;
   budgets!: Table<Budget, string>;
+  templates!: Table<TransactionTemplate, string>;
   kv!: Table<KVRow, string>;
 
   constructor() {
@@ -72,6 +73,19 @@ class PaisaBook extends Dexie {
       syncLog: null,
       yjsLog: null,
     });
+    // v5: Add transaction templates table for recurring transactions
+    this.version(5).stores({
+      accounts: "id, name, archived",
+      entries: "id, accountId, date, type, categoryId, sourceRef, reservedFundId, templateId",
+      categories: "id, kind",
+      rules: "id, categoryId",
+      reservedFunds: "id, status, direction",
+      plannedExpenses: "id, status, dueDate",
+      goals: "id",
+      budgets: "id, categoryId, monthYear",
+      templates: "id, enabled, recurrence, categoryId",
+      kv: "key",
+    });
   }
 }
 
@@ -93,18 +107,18 @@ export async function kvDel(key: string): Promise<void> {
 /* ---------------- snapshot / restore / merge ---------------- */
 
 export async function snapshotAll(): Promise<SnapshotData> {
-  const [accounts, entries, categories, rules, reservedFunds, plannedExpenses, goals, budgets] = await Promise.all([
+  const [accounts, entries, categories, rules, reservedFunds, plannedExpenses, goals, budgets, templates] = await Promise.all([
     db.accounts.toArray(), db.entries.toArray(), db.categories.toArray(), db.rules.toArray(), db.reservedFunds.toArray(),
-    db.plannedExpenses.toArray(), db.goals.toArray(), db.budgets.toArray(),
+    db.plannedExpenses.toArray(), db.goals.toArray(), db.budgets.toArray(), db.templates.toArray(),
   ]);
-  return { accounts, entries, categories, rules, reservedFunds, plannedExpenses, goals, budgets };
+  return { accounts, entries, categories, rules, reservedFunds, plannedExpenses, goals, budgets, templates };
 }
 
 export async function restoreAll(d: SnapshotData): Promise<void> {
-  await db.transaction("rw", [db.accounts, db.entries, db.categories, db.rules, db.reservedFunds, db.plannedExpenses, db.goals, db.budgets], async () => {
+  await db.transaction("rw", [db.accounts, db.entries, db.categories, db.rules, db.reservedFunds, db.plannedExpenses, db.goals, db.budgets, db.templates], async () => {
     await Promise.all([
       db.accounts.clear(), db.entries.clear(), db.categories.clear(), db.rules.clear(), db.reservedFunds.clear(),
-      db.plannedExpenses.clear(), db.goals.clear(), db.budgets.clear(),
+      db.plannedExpenses.clear(), db.goals.clear(), db.budgets.clear(), db.templates.clear(),
     ]);
     await db.accounts.bulkPut(d.accounts ?? []);
     await db.entries.bulkPut(d.entries ?? []);
@@ -114,6 +128,7 @@ export async function restoreAll(d: SnapshotData): Promise<void> {
     await db.plannedExpenses.bulkPut(d.plannedExpenses ?? []);
     await db.goals.bulkPut(d.goals ?? []);
     await db.budgets.bulkPut(d.budgets ?? []);
+    await db.templates.bulkPut(d.templates ?? []);
   });
 }
 

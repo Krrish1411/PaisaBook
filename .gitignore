@@ -1,3 +1,137 @@
 ```
+# Dependencies
+node_modules/
+
+# Build artifacts
 dist/
+build/
+target/
+
+# Package lock files
+package-lock.json
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/sdks
+!.yarn/versions
+
+# TypeScript/JavaScript build output
+*.tsbuildinfo
+*.js.map
+*.mjs.map
+*.cjs.map
+
+# Temporary files
+*.tmp
+*.temp
+*.log
+
+# Environment variables
+.env
+.env.local
+*.env.*
+
+# IDE specific
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS specific
+.DS_Store
+Thumbs.db
+
+# Coverage reports
+coverage/
+htmlcov/
+*.coverage
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+
+# Virtual environments
+venv/
+.venv/
+env/
+ENV/
+
+# Rust/Cargo (if applicable)
+Cargo.lock
+target/
+
+# Go (if applicable)
+go.mod
+go.sum
+*.exe
+
+# Java/Maven/Gradle (if applicable)
+pom.xml
+gradlew
+gradlew.bat
+.gradle/
+target/
+
+# C/C++ (if applicable)
+*.o
+*.a
+*.so
+*.dll
+*.exe
+
+# Browserslist
+.browserslistrc
+
+# MyPy
+.mypy_cache/
+
+# Pytest
+.pytest_cache/
+
+# SvelteKit (if applicable)
+.svelte-kit/
+
+# Vite (if applicable)
+.vite/
+
+# Nuxt/Vue (if applicable)
+.nuxt/
+.output/
+
+# Next.js (if applicable)
+.next/
+out/
+
+# Gatsby (if applicable)
+.cache/
+public/
+
+# Compressed files
+*.zip
+*.gz
+*.tar
+*.tgz
+*.bz2
+*.xz
+*.7z
+*.rar
+*.zst
+*.lz4
+*.lzh
+*.cab
+*.arj
+*.rpm
+*.deb
+*.Z
+*.lz
+*.lzo
+*.tar.gz
+*.tar.bz2
+*.tar.xz
+*.tar.zst
+
 ```

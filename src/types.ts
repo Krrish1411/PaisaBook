@@ -7,7 +7,7 @@ export interface Account {
   id: string;
   name: string;
   type: AccountType;
-  currency: string;
+  currency: string; // ISO code (default INR)
   openingBalance: number;
   archived?: boolean;
   createdAt: string;
@@ -27,6 +27,23 @@ export interface Entry {
   isReserved?: boolean;
   reservedFundId?: string | null;
   tags: string[];
+  createdAt: string;
+  updatedAt: string;
+  templateId?: string | null; // For recurring transaction templates
+}
+
+export interface TransactionTemplate {
+  id: string;
+  name: string;
+  accountId: string;
+  toAccountId?: string | null;
+  type: TxType;
+  amount: number;
+  currency?: string;
+  categoryId: string | null;
+  recurrence: Recurrence;
+  lastUsedDate?: string | null;
+  enabled: boolean;
   createdAt: string;
   updatedAt: string;
 }
@@ -110,6 +127,7 @@ export interface SnapshotData {
   plannedExpenses: PlannedExpense[];
   goals: Goal[];
   budgets: Budget[];
+  templates?: TransactionTemplate[];
 }
 
 
