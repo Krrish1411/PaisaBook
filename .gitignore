@@ -5,7 +5,8 @@ node_modules/
 # Build artifacts
 dist/
 build/
-target/
+*.js
+*.css
 
 # Environment
 .env
