@@ -1,7 +1,1 @@
-```
-# Dependencies
-node_modules/
-
-# Vite build artifacts
-node_modules/.vite/
-```
+Nothing needs to be added to .gitignore since the changes only include source code files (.tsx) and no build artifacts, dependencies, or temporary files.
