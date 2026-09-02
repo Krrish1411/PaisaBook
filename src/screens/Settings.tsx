@@ -68,29 +68,6 @@ export default function Settings() {
         <div className="border-t border-line/60 my-4" />
         
         <div className="mb-3">
-          <div className="text-[12.5px] font-semibold text-ink/70 uppercase tracking-wide mb-2">Layout Engine</div>
-          <div className="grid grid-cols-2 gap-2">
-            {(["classic", "modern", "compact", "spacious"] as const).map((layout) => (
-              <button
-                key={layout}
-                onClick={() => void updatePrefs({ layoutEngine: layout })}
-                className={cx(
-                  "rounded-xl px-3 py-2.5 text-[13px] font-semibold border transition-all capitalize",
-                  prefs.layoutEngine === layout
-                    ? "bg-pine-700 text-white border-pine-700 shadow-md"
-                    : "bg-moss text-ink/70 border-line hover:border-pine-400"
-                )}
-              >
-                {layout}
-              </button>
-            ))}
-          </div>
-          <p className="text-[11px] text-ink/45 mt-2">Classic: traditional sidebar • Modern: wider with gradients • Compact: icon-only • Spacious: full-width premium</p>
-        </div>
-        
-        <div className="border-t border-line/60 my-4" />
-        
-        <div>
           <div className="text-[12.5px] font-semibold text-ink/70 uppercase tracking-wide mb-2">Font Scaling</div>
           <div className="grid grid-cols-4 gap-2">
             {(["100", "110", "125", "150"] as const).map((scale) => (
