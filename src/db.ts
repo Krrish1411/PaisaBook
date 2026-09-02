@@ -325,7 +325,11 @@ export async function deleteRule(id: string): Promise<void> {
 /** Boot-time seed: categories only. Never adds demo money. */
 export async function seedCategories(): Promise<void> {
   const n = await db.categories.count();
-  if (n === 0) await db.categories.bulkPut(SEED_CATEGORIES);
+  if (n === 0) {
+    await db.transaction("rw", db.categories, async () => {
+      await db.categories.bulkPut(SEED_CATEGORIES);
+    });
+  }
 }
 
 /**
