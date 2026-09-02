@@ -13,7 +13,7 @@ import { CalendarRange, Download, Flag, Gauge, PiggyBank, Target, TrendingDown, 
 import { db, getRates } from "../db";
 import type { Entry } from "../types";
 import { accountBalance, isRealExpense, isRealIncome } from "../lib/compute";
-import { cx, daysUntil, downloadText, fmtCompactINR, fmtDate, fmtINR, maskTick, monthKey, monthLabel, pct, toISO, todayISO, usePrivacy } from "../lib/core";
+import { cx, daysUntil, downloadText, downloadAsXLSX, downloadAsPDF, fmtCompactINR, fmtDate, fmtINR, maskTick, monthKey, monthLabel, pct, toISO, todayISO, usePrivacy } from "../lib/core";
 import { Badge, Btn, Card, EmptyState, Reveal, SectionTitle, Seg, TInput, useTween } from "../components/ui";
 
 type Period = "7d" | "30d" | "3m" | "1y" | "custom";
@@ -178,11 +178,11 @@ function RatioTile({ label, value, ok, hint, delay }: { label: string; value: st
 export default function Reports({ go }: { go: (t: string) => void }) {
   usePrivacy(); // subscribe → every number re-masks instantly when privacy flips
   const data = useLiveQuery(async () => {
-    const [entries, accounts, categories, budgets, goals, plans, rates] = await Promise.all([
+    const [entries, accounts, categories, budgets, goals, plans, funds, rates] = await Promise.all([
       db.entries.toArray(), db.accounts.toArray(), db.categories.toArray(),
-      db.budgets.toArray(), db.goals.toArray(), db.plannedExpenses.toArray(), getRates(),
+      db.budgets.toArray(), db.goals.toArray(), db.plannedExpenses.toArray(), db.funds.toArray(), getRates(),
     ]);
-    return { entries, accounts, categories, budgets, goals, plans, rates };
+    return { entries, accounts, categories, budgets, goals, plans, funds, rates };
   }, []);
 
   const [period, setPeriod] = useState<Period>("30d");
@@ -381,6 +381,39 @@ export default function Reports({ go }: { go: (t: string) => void }) {
     downloadText(`paisabook-report-${startISO}-to-${endISO}.csv`, "\ufeff" + csv, "text/csv;charset=utf-8");
   };
 
+  const exportXLSX = () => {
+    if (!data) return;
+    const rows = data.entries
+      .filter((t) => t.date >= startISO && t.date <= endISO)
+      .sort((a, b) => a.date.localeCompare(b.date))
+      .map((t) => ({
+        Date: t.date,
+        Type: t.type,
+        Amount: t.amount,
+        Category: data.categories.find((c) => c.id === t.categoryId)?.name ?? "",
+        Note: t.note || "",
+        Account: data.accounts.find((a) => a.id === t.accountId)?.name ?? "",
+        Ref: t.sourceRef ?? "",
+      }));
+    downloadAsXLSX(`paisabook-report-${startISO}-to-${endISO}.xlsx`, rows, ["Date", "Type", "Amount", "Category", "Note", "Account", "Ref"]);
+  };
+
+  const exportPDF = () => {
+    if (!data) return;
+    const rows = data.entries
+      .filter((t) => t.date >= startISO && t.date <= endISO)
+      .sort((a, b) => a.date.localeCompare(b.date))
+      .map((t) => ({
+        Date: t.date,
+        Type: t.type,
+        Amount: fmtINR(t.amount),
+        Category: data.categories.find((c) => c.id === t.categoryId)?.name ?? "",
+        Note: t.note || "",
+        Account: data.accounts.find((a) => a.id === t.accountId)?.name ?? "",
+      }));
+    downloadAsPDF(`paisabook-report-${startISO}-to-${endISO}.pdf`, `Transaction Report (${startISO} to ${endISO})`, rows, ["Date", "Type", "Amount", "Category", "Note", "Account"]);
+  };
+
   if (!data) return null;
   if (data.entries.length === 0) {
     return (
@@ -407,7 +440,11 @@ export default function Reports({ go }: { go: (t: string) => void }) {
           <h1 className="font-display font-extrabold text-[24px] tracking-tight">Reports</h1>
           <p className="text-[12.5px] text-ink/50 mt-0.5">{fmtDate(startISO)} → {fmtDate(endISO)} · vs previous {Math.round((win.end.getTime() - win.start.getTime()) / 86400000) + 1} days</p>
         </div>
-        <Btn size="sm" variant="outline" icon={<Download size={13} />} onClick={exportCsv}>CSV</Btn>
+        <div className="flex gap-2">
+          <Btn size="sm" variant="outline" icon={<Download size={13} />} onClick={exportCsv}>CSV</Btn>
+          <Btn size="sm" variant="outline" icon={<Download size={13} />} onClick={exportXLSX}>Excel</Btn>
+          <Btn size="sm" variant="outline" icon={<Download size={13} />} onClick={exportPDF}>PDF</Btn>
+        </div>
       </div>
 
       <div className="sticky top-[54px] lg:top-0 z-20 -mx-4 px-4 pt-2.5 pb-2 bg-moss/90 backdrop-blur anim-fade-up">

@@ -292,6 +292,62 @@ export function downloadBlob(filename: string, blob: Blob): void {
 export const downloadText = (filename: string, text: string, type = "text/plain") =>
   downloadBlob(filename, new Blob([text], { type }));
 
+export const downloadJSON = (filename: string, data: any) =>
+  downloadBlob(filename, new Blob([JSON.stringify(data, null, 2)], { type: "application/json" }));
+
+// Simple CSV to XLSX conversion (Excel-compatible HTML table)
+export const downloadAsXLSX = (filename: string, rows: any[], headers: string[]) => {
+  const tableRows = rows.map(row => 
+    `<tr>${headers.map(h => `<td>${String(row[h] ?? "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")}</td>`).join("")}</tr>`
+  ).join("");
+  const html = `
+    <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">
+    <head><meta charset="UTF-8"></head>
+    <body><table>${tableRows}</table></body>
+    </html>
+  `;
+  downloadBlob(filename, new Blob([html], { type: "application/vnd.ms-excel;charset=utf-8" }));
+};
+
+// Simple PDF generation using basic HTML
+export const downloadAsPDF = async (filename: string, title: string, rows: any[], headers: string[]) => {
+  // For now, we'll generate a print-friendly HTML that users can save as PDF
+  // In production, you'd use a library like jsPDF or pdfmake
+  const html = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="UTF-8">
+      <title>${title}</title>
+      <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        h1 { color: #12855a; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background-color: #12855a; color: white; }
+        tr:nth-child(even) { background-color: #f2f2f2; }
+        @media print { body { padding: 0; } }
+      </style>
+    </head>
+    <body>
+      <h1>${title}</h1>
+      <p>Generated on ${new Date().toLocaleString("en-IN")}</p>
+      <table>
+        <thead><tr>${headers.map(h => `<th>${h}</th>`).join("")}</tr></thead>
+        <tbody>
+          ${rows.map(row => 
+            `<tr>${headers.map(h => `<td>${String(row[h] ?? "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")}</td>`).join("")}</tr>`
+          ).join("")}
+        </tbody>
+      </table>
+      <script>window.onload = () => window.print();</script>
+    </body>
+    </html>
+  `;
+  downloadBlob(filename.replace(".pdf", ".html"), new Blob([html], { type: "text/html;charset=utf-8" }));
+  alert("PDF export opens your browser's print dialog. Select 'Save as PDF' to complete.");
+};
+
 /* ---------------- preferences ---------------- */
 
 export type ThemeId = "pine" | "ember" | "night" | "ocean" | "dusk" | "sand" | "berry" | "graphite";
