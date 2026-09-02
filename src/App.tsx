@@ -75,10 +75,13 @@ export default function App() {
     return () => window.removeEventListener("keydown", onKey);
   }, [prefs.autoLockMinutes]);
 
-  // Load categories if empty
-  useLiveQuery(async () => {
-    const cats = await db.categories.toArray();
-    if (cats.length === 0) await seedCategories();
+  // Load categories if empty - use useEffect to avoid readwrite in liveQuery
+  useEffect(() => {
+    const checkAndSeed = async () => {
+      const cats = await db.categories.toArray();
+      if (cats.length === 0) await seedCategories();
+    };
+    checkAndSeed();
   }, []);
 
   return (

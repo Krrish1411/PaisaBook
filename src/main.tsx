@@ -7,8 +7,11 @@ import { initAutoLock } from "./lib/autoLock";
 // Register service worker for PWA offline support
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
-    const swPath = window.location.pathname.endsWith('/') ? 'sw.js' : '../sw.js';
-    navigator.serviceWorker.register(swPath).catch(console.error);
+    // Use absolute path from root for GitHub Pages
+    const swPath = '/PaisaBook/sw.js';
+    navigator.serviceWorker.register(swPath).catch((err) => {
+      console.log('SW registration failed:', err);
+    });
   });
 }
 
