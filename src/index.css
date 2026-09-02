@@ -115,13 +115,41 @@
 .text-ink\/60 { color: color-mix(in srgb, var(--color-ink) 78%, transparent); }
 .text-ink\/65 { color: color-mix(in srgb, var(--color-ink) 82%, transparent); }
 .placeholder\:text-ink\/30::placeholder { color: color-mix(in srgb, var(--color-ink) 48%, transparent); }
-html { -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; }
+html { -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; font-size: 100%; }
+html[data-layout="modern"] { font-size: 110%; }
+html[data-layout="spacious"] { font-size: 125%; }
+html[data-layout="compact"] { font-size: 95%; }
 
 html { font-family: var(--font-body); }
 body { background: var(--color-moss); color: var(--color-ink); }
 
 .font-display { font-family: var(--font-display); }
 .num { font-variant-numeric: tabular-nums; font-feature-settings: "tnum"; letter-spacing: -0.01em; }
+
+/* Layout engines - different UI patterns for desktop/mobile/tablet */
+@media (min-width: 1024px) {
+  /* Desktop layouts */
+  html[data-layout="classic"] .main-content { max-width: 1200px; margin: 0 auto; padding: 1.5rem 2rem; }
+  html[data-layout="modern"] .main-content { max-width: 1600px; margin: 0 auto; padding: 2rem 3rem; }
+  html[data-layout="compact"] .main-content { max-width: 1000px; margin: 0 auto; padding: 1rem 1.5rem; }
+  html[data-layout="spacious"] .main-content { max-width: 1920px; margin: 0 auto; padding: 2.5rem 4rem; }
+}
+
+@media (min-width: 768px) and (max-width: 1023px) {
+  /* Tablet layouts */
+  html[data-layout="classic"] .main-content { max-width: 100%; padding: 1rem 1.5rem; }
+  html[data-layout="modern"] .main-content { max-width: 100%; padding: 1.5rem 2rem; }
+  html[data-layout="compact"] .main-content { max-width: 100%; padding: 0.75rem 1rem; }
+  html[data-layout="spacious"] .main-content { max-width: 100%; padding: 1.5rem 2.5rem; }
+}
+
+@media (max-width: 767px) {
+  /* Mobile layouts */
+  html[data-layout="classic"] .main-content { padding: 0.75rem 1rem; }
+  html[data-layout="modern"] .main-content { padding: 1rem 1.25rem; }
+  html[data-layout="compact"] .main-content { padding: 0.5rem 0.75rem; }
+  html[data-layout="spacious"] .main-content { padding: 1rem 1.5rem; }
+}
 
 /* ---------- ambient page texture ---------- */
 .page-bg {

@@ -1,21 +1,53 @@
 ```
+# Dependencies
+node_modules/
+
 # Build artifacts
 dist/
 build/
 *.js
 *.css
 
-# Dependencies
-node_modules/
-
 # Environment
 .env
 .env.local
-*.env.*
+.env.*
 
-# Editors
+# Editor/IDE
 .vscode/
+.idea/
+*.swp
+*.swo
+*.tmp
 
 # Logs
 *.log
+
+# Python (if present)
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Coverage
+coverage/
+htmlcov/
+.coverage
+
+# MyPy
+.mypy_cache/
+
+# Pytest
+.pytest_cache/
+
+# Gradle
+.gradle/
+
+# Temporary files
+*.tmp
+*.temp
+
+# OS specific
+.DS_Store
+Thumbs.db
 ```
