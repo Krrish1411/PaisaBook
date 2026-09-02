@@ -295,11 +295,17 @@ export const downloadText = (filename: string, text: string, type = "text/plain"
 /* ---------------- preferences ---------------- */
 
 export type ThemeId = "pine" | "ember" | "night" | "ocean" | "dusk" | "sand" | "berry" | "graphite";
+export type LayoutEngine = "classic" | "modern" | "compact" | "spacious";
+export type FontScale = "100" | "110" | "125" | "150";
+
 export interface Prefs {
   theme: ThemeId;
+  layoutEngine: LayoutEngine;
+  fontScale: FontScale;
+  autoLockMinutes: number;
 }
 
-let prefs: Prefs = { theme: "pine" };
+let prefs: Prefs = { theme: "pine", layoutEngine: "classic", fontScale: "100", autoLockMinutes: 5 };
 const prefListeners = new Set<() => void>();
 
 function storage(): Storage | null {
@@ -311,10 +317,11 @@ function storage(): Storage | null {
 }
 
 const VALID_THEMES: ThemeId[] = ["pine", "ember", "night", "ocean", "dusk", "sand", "berry", "graphite"];
+const VALID_LAYOUTS: LayoutEngine[] = ["classic", "modern", "compact", "spacious"];
+const VALID_SCALES: FontScale[] = ["100", "110", "125", "150"];
 
 function applyTheme(theme: ThemeId): void {
   try {
-    // modern browsers: cross-fade the whole palette; others: instant
     const doc = document as Document & { startViewTransition?: (fn: () => void) => void };
     const run = () => {
       document.documentElement.dataset.theme = theme;
@@ -326,20 +333,45 @@ function applyTheme(theme: ThemeId): void {
   }
 }
 
+function applyFontScale(scale: FontScale): void {
+  try {
+    document.documentElement.style.fontSize = `${scale}%`;
+  } catch {
+    /* no DOM */
+  }
+}
+
+function applyLayout(layout: LayoutEngine): void {
+  try {
+    document.documentElement.dataset.layout = layout;
+  } catch {
+    /* no DOM */
+  }
+}
+
 try {
   const raw = storage()?.getItem("pb-prefs");
   if (raw) {
     const p = JSON.parse(raw) as Partial<Prefs>;
-    prefs = { theme: VALID_THEMES.includes(p.theme as ThemeId) ? (p.theme as ThemeId) : "pine" };
+    prefs = {
+      theme: VALID_THEMES.includes(p.theme as ThemeId) ? (p.theme as ThemeId) : "pine",
+      layoutEngine: VALID_LAYOUTS.includes(p.layoutEngine as LayoutEngine) ? (p.layoutEngine as LayoutEngine) : "classic",
+      fontScale: VALID_SCALES.includes(p.fontScale as FontScale) ? (p.fontScale as FontScale) : "100",
+      autoLockMinutes: typeof p.autoLockMinutes === "number" && p.autoLockMinutes >= 0 ? p.autoLockMinutes : 5,
+    };
   }
 } catch { /* defaults */ }
 applyTheme(prefs.theme);
+applyFontScale(prefs.fontScale);
+applyLayout(prefs.layoutEngine);
 
 export const getPrefs = () => prefs;
 
 export async function savePrefs(patch: Partial<Prefs>): Promise<void> {
   prefs = { ...prefs, ...patch };
   applyTheme(prefs.theme);
+  applyFontScale(prefs.fontScale);
+  applyLayout(prefs.layoutEngine);
   try {
     storage()?.setItem("pb-prefs", JSON.stringify(prefs));
     storage()?.setItem("pb-theme", JSON.stringify(prefs.theme));
