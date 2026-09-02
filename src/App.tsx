@@ -201,7 +201,7 @@ function Shell() {
       <div className={cx(isDesktop && "lg:pl-64")}>
         {/* mobile header */}
         <header className="sticky top-0 z-30 bg-moss/85 backdrop-blur border-b border-line/80 lg:hidden">
-          <div className="max-w-xl mx-auto px-4 h-[54px] flex items-center gap-3">
+          <div className="px-4 h-[54px] flex items-center gap-3">
             <button onClick={() => setTab("home")} className="flex items-center gap-2.5 group" aria-label="PaisaBook home">
               <span className="w-9 h-9 rounded-xl hero-weave border border-pine-700 grid place-items-center text-mari-400 shadow-sm shadow-pine-900/30 group-active:scale-95 transition-transform">
                 <IndianRupee size={17} />
@@ -219,7 +219,7 @@ function Shell() {
           </div>
         </header>
 
-        <main className="max-w-content safe-bottom pt-4 lg:pt-6 lg:px-6">
+        <main className="max-w-content safe-bottom pt-4 lg:pt-8">
           <BootGate>
             <Boundary label={TITLES[tab]} onRetry={() => setTab(tab)}>
               <div key={tab} className="page-enter">
@@ -238,7 +238,7 @@ function Shell() {
 
       {/* mobile bottom nav + FAB */}
       <nav className="fixed bottom-0 inset-x-0 z-40 pointer-events-none lg:hidden">
-        <div className="max-w-xl mx-auto px-4 pb-[calc(env(safe-area-inset-bottom,0px)+10px)]">
+        <div className="px-4 pb-[calc(env(safe-area-inset-bottom,0px)+10px)]">
           <div className="pointer-events-auto relative grid grid-cols-[1fr_1fr_64px_1fr_1fr] items-end rounded-2xl border border-pine-800/70 bg-pine-950/95 backdrop-blur px-2 pt-1.5 pb-2 shadow-2xl shadow-pine-950/50">
             <TabBtn t={MOBILE_TABS[0]} active={tab === "home"} onClick={() => setTab("home")} />
             <TabBtn t={MOBILE_TABS[1]} active={tab === "txns"} onClick={() => setTab("txns")} />
@@ -332,7 +332,10 @@ function Sidebar({ tab, setTab, openAdd, prefs, updatePrefs }: {
 
         <div className="mx-4 mt-4 rounded-xl hero-weave text-pine-50 px-3.5 py-3 relative overflow-hidden">
           <div className="text-[10px] uppercase tracking-[0.14em] font-semibold text-pine-200/80 flex items-center gap-1"><Wallet size={11} /> Available to spend</div>
-          <div className="font-display font-extrabold text-[21px] num tracking-tight mt-0.5">{fmtCompactINR(stats?.available ?? 0)}</div>
+          <div className="font-display font-extrabold text-[21px] num tracking-tight mt-0.5">
+            {isMasked ? "•••••" : fmtCompactINR(stats?.available ?? 0)}
+          </div>
+          <div className="text-[9px] text-pine-200/60 mt-0.5">{isMasked ? "Hidden for privacy" : "Live balance"}</div>
         </div>
 
         <div className="flex-1" />
