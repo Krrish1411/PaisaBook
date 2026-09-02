@@ -239,14 +239,21 @@ export default function Reports({ go }: { go: (t: string) => void }) {
 
   const nwSeries = useMemo(() => {
     if (!data) return [];
-    const active = data.accounts.filter((a) => !a.archived);
+    const all = data.accounts; // include archived accounts in net worth
+    const activeFunds = data.funds.filter((f) => f.status === "active");
+    const reservedHolding = activeFunds.filter((f) => f.direction === "holding_for_them").reduce((s, f) => s + f.amount, 0);
+    const reservedBorrowed = activeFunds.filter((f) => f.direction === "borrowed_from_them").reduce((s, f) => s + f.amount, 0);
+    const givenOutTotal = activeFunds.filter((f) => f.direction === "given_out").reduce((s, f) => s + f.amount, 0);
+    
     return buckets.map((b) => {
       const e = toISO(b.end);
-      let nw = 0;
-      for (const a of active) {
+      let raw = 0;
+      for (const a of all) {
         const bal = accountBalance(a, data.entries.filter((t) => t.date <= e));
-        nw += bal * (data.rates[a.currency ?? "INR"] ?? 1);
+        raw += bal * (data.rates[a.currency ?? "INR"] ?? 1);
       }
+      // net worth = assets − liabilities − others' money + your money with others
+      const nw = raw - reservedHolding - reservedBorrowed + givenOutTotal;
       return { label: b.label, netWorth: Math.round(nw) };
     });
   }, [data, buckets]);
