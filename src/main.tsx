@@ -7,7 +7,8 @@ import { initAutoLock } from "./lib/autoLock";
 // Register service worker for PWA offline support
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/sw.js').catch(console.error);
+    const swPath = window.location.pathname.endsWith('/') ? 'sw.js' : '../sw.js';
+    navigator.serviceWorker.register(swPath).catch(console.error);
   });
 }
 
