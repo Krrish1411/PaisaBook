@@ -86,7 +86,7 @@ export default function App() {
 
   return (
     <ToastProvider>
-      <div className={cx("min-h-screen bg-moss text-ink antialiased selection:bg-pine-500/20", `scale-${prefs.fontScale}`)}>
+      <div className={cx("min-h-screen bg-moss text-ink antialiased selection:bg-pine-500/20")}>
         <header className="sticky top-0 z-30 border-b border-line bg-moss/80 backdrop-blur">
           <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 lg:px-6">
             <div className="flex items-center gap-3">
@@ -118,8 +118,8 @@ export default function App() {
         <main className="mx-auto max-w-7xl px-4 py-6 lg:px-6 lg:py-8">
           <Boundary label={TITLES[tab]} onRetry={() => force(f => f + 1)}>
             <Suspense fallback={<div className="grid place-items-center py-20"><div className="w-8 h-8 border-2 border-pine-500 border-t-transparent rounded-full animate-spin" /></div>}>
-              {tab === "home" && <Dashboard go={(t) => setTab(t as Tab)} />}
-              {tab === "txns" && <Entries go={(t) => setTab(t as Tab)} />}
+              {tab === "home" && <Dashboard go={(t) => setTab(t as Tab)} openAdd={() => setShowEntry(true)} />}
+              {tab === "txns" && <Entries openAdd={() => setShowEntry(true)} />}
               {tab === "funds" && <Funds go={(t) => setTab(t as Tab)} />}
               {tab === "reports" && <Reports go={(t) => setTab(t as Tab)} />}
               {tab === "settings" && <Settings go={(t) => setTab(t as Tab)} />}
